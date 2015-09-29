@@ -60,7 +60,7 @@ public class tutorial implements IXposedHookLoadPackage {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 // this will be called before the clock was updated by the original method
-        	    XposedBridge.log("logWrite2"+ String.valueOf(param.args[0]) + param.args[1] + param.args[2] + param.args[3] + param.args[8]);
+        	    XposedBridge.log( (String) param.args[2] + param.args[3] + param.args[8]);
             }
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
@@ -69,42 +69,4 @@ public class tutorial implements IXposedHookLoadPackage {
         });
     }
     
-    public static String byte2HexStr(byte[] b) {    
-        String stmp="";    
-        StringBuilder sb = new StringBuilder("");    
-        for (int n=0;n<b.length;n++)    
-        {    
-            stmp = Integer.toHexString(b[n] & 0xFF);    
-            sb.append((stmp.length()==1)? "0"+stmp : stmp);    
-            sb.append(" ");    
-        }    
-        return sb.toString().toUpperCase().trim();    
-    }    
-    
-    public static void getObject(Object obj,String fieldName) throws IllegalArgumentException, IllegalAccessException{
-    	Field [] fields=obj.getClass().getDeclaredFields();
-    	for(Field field:fields){
-	    	field.setAccessible(true);//设置访问权限
-	    	XposedBridge.log(field.get(obj).toString());
-	    	XposedBridge.log(field.getName());
-    	}
-    }
-    
-    @SuppressWarnings("rawtypes")
-    private static void getMethodInfo(Class clazz) {
-    	//Class clazz = XposedHelpers.findClass(className, lpparam.classLoader);//Class.forName(pkgName);
-		Method[] methods = clazz.getMethods();
-		for (Method method : methods) {
-		    String methodName = method.getName();
-		    //System.out.println("方法名称:" + methodName);
-		    XposedBridge.log("方法名称:" + methodName);
-		    Class<?>[] parameterTypes = method.getParameterTypes();
-		    for (Class<?> clas : parameterTypes) {
-		        String parameterName = clas.getName();
-		        //System.out.println("参数名称:" + parameterName);
-		        XposedBridge.log("参数名称:" + parameterName);
-		    }
-		    //System.out.println("*****************************");
-		}
-    }
 }
