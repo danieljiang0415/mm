@@ -18,7 +18,8 @@ public class tutorial implements IXposedHookLoadPackage {
         if (!lpparam.packageName.equals("com.tencent.mm"))
             return;
         XposedBridge.log(lpparam.packageName);
-        Class PByteArrary = XposedHelpers.findClass("com.tencent.mm.pointers.PByteArray", lpparam.classLoader);
+        Class<?> PByteArrary = XposedHelpers.findClass("com.tencent.mm.pointers.PByteArray", lpparam.classLoader);
+        Class<?> PInt = XposedHelpers.findClass("com.tencent.mm.pointers.PInt", lpparam.classLoader);
         //Field [] fields=PByteArrary.getDeclaredFields();
     	//for(Field field:fields){
 	    //	field.setAccessible(true);//设置访问权限
@@ -34,7 +35,7 @@ public class tutorial implements IXposedHookLoadPackage {
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 // this will be called before the clock was updated by the original method
             	String s = Utility.byte2HexStr((byte[]) param.args[0]);
-            	XposedBridge.log( s );
+            	//XposedBridge.log( s );
             }
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
@@ -42,6 +43,18 @@ public class tutorial implements IXposedHookLoadPackage {
             }
         });
         
+        findAndHookMethod("com.tencent.mm.protocal.MMProtocalJni", lpparam.classLoader, "unpack", PByteArrary, byte[].class, byte[].class, PByteArrary, PInt, PInt, new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                // this will be called before the clock was updated by the original method
+            }
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                // this will be called after the clock was updated by the original method
+            	String s = Utility.byte2HexStr((byte[]) param.args[2]);
+            	XposedBridge.log( s );
+            }
+        });
         //getMethodInfo(Class.forName("java.lang.StringBuilder"));
         //Class Xlog = XposedHelpers.findClass("com.tencent.mm.xlog.Xlog", lpparam.classLoader);
         findAndHookMethod("com.tencent.mm.xlog.Xlog", lpparam.classLoader, "logWrite2", int.class, String.class, String.class, String.class, int.class, int.class, long.class, long.class, String.class, new XC_MethodHook() {
