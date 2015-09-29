@@ -33,20 +33,8 @@ public class tutorial implements IXposedHookLoadPackage {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 // this will be called before the clock was updated by the original method
-            	Field [] fields=param.args[1].getClass().getDeclaredFields();
-            	for(Field field:fields){
-        	    	field.setAccessible(true);//设置访问权限
-        	    	//if(field.getName().equals("value")){
-        	    	//	XposedBridge.log(byte2HexStr( (byte[]) field.get(param.args[1])));
-        	    	XposedBridge.log(field.getName());
-        	    	byte[] packet = (byte[])field.get(param.args[1]);
-        	    	XposedBridge.log(Arrays.toString(packet));
-        	    	//XposedBridge.log(field.get(param.args[1]));
-        	    	//}
-        	    	//XposedBridge.log(field.get(obj).toString());
-        	    	//XposedBridge.log(field.getName());
-            	}
-            	
+            	String s = Utility.byte2HexStr((byte[]) param.args[0]);
+            	XposedBridge.log( s );
             }
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
@@ -60,7 +48,7 @@ public class tutorial implements IXposedHookLoadPackage {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 // this will be called before the clock was updated by the original method
-        	    XposedBridge.log( (String) param.args[2] + param.args[3] + param.args[8]);
+        	   // XposedBridge.log( (String) param.args[2] + param.args[3] + param.args[8]);
             }
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
