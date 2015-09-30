@@ -35,7 +35,7 @@ public class tutorial implements IXposedHookLoadPackage {
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 // this will be called before the clock was updated by the original method
             	String s = Utility.byte2HexStr((byte[]) param.args[0]);
-            	//XposedBridge.log( s );
+            	XposedBridge.log("-------------->" + s );
             }
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
@@ -51,8 +51,8 @@ public class tutorial implements IXposedHookLoadPackage {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                 // this will be called after the clock was updated by the original method
-            	String s = Utility.byte2HexStr((byte[]) param.args[2]);
-            	XposedBridge.log( s );
+            	String s = Utility.byte2HexStr((byte[]) param.args[1]);
+            	XposedBridge.log("<--------------" + s );
             }
         });
         //getMethodInfo(Class.forName("java.lang.StringBuilder"));
