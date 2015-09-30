@@ -18,7 +18,7 @@ public class tutorial implements IXposedHookLoadPackage {
         if (!lpparam.packageName.equals("com.tencent.mm"))
             return;
         XposedBridge.log(lpparam.packageName);
-        Class<?> PByteArrary = XposedHelpers.findClass("com.tencent.mm.pointers.PByteArray", lpparam.classLoader);
+        final Class<?> PByteArrary = XposedHelpers.findClass("com.tencent.mm.pointers.PByteArray", lpparam.classLoader);
         Class<?> PInt = XposedHelpers.findClass("com.tencent.mm.pointers.PInt", lpparam.classLoader);
         //Field [] fields=PByteArrary.getDeclaredFields();
     	//for(Field field:fields){
@@ -35,8 +35,11 @@ public class tutorial implements IXposedHookLoadPackage {
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 // this will be called before the clock was updated by the original method
             	String s = Utility.byte2HexStr((byte[]) param.args[0]);
-            	XposedBridge.log("-------------->" + s );
-            	Utility.writeMem2SDFile("logger.log", (byte[])param.args[0] );
+            	Utility.writeLog2SDFile("logger.log", s );
+            	//XposedBridge.log("-------------->" + s );
+            	//s = "packet start-->";
+            	//Utility.writeMem2SDFile("logger.log", s.getBytes() );
+            	//Utility.writeMem2SDFile("logger.log", (byte[])param.args[0] );
             }
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
@@ -52,9 +55,16 @@ public class tutorial implements IXposedHookLoadPackage {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                 // this will be called after the clock was updated by the original method
-            	String s = Utility.byte2HexStr((byte[]) param.args[1]);
-            	XposedBridge.log("<--------------" + s );
-            	Utility.writeMem2SDFile("logger.log", (byte[])param.args[1] );
+    	    	Field field = PByteArrary.getDeclaredField("value");
+    	        field.setAccessible(true);
+    	        byte[] buf = (byte[]) field.get(param.args[0]);
+            	Utility.writeLog2SDFile("logger.log", "unpack size---->"+String.valueOf(buf.length) );		
+            	String s = Utility.byte2HexStr(buf);
+            	Utility.writeLog2SDFile("logger.log", s );
+            	//XposedBridge.log("<--------------" + s );
+            	//s = "<--packet start";
+            	//Utility.writeMem2SDFile("logger.log", s.getBytes() );
+            	//Utility.writeMem2SDFile("logger.log", (byte[])param.args[1] );
             }
         });
         //getMethodInfo(Class.forName("java.lang.StringBuilder"));
@@ -64,6 +74,7 @@ public class tutorial implements IXposedHookLoadPackage {
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 // this will be called before the clock was updated by the original method
         	   // XposedBridge.log( (String) param.args[2] + param.args[3] + param.args[8]);
+            	Utility.writeLog2SDFile("logger.log", (String)param.args[8] );
             }
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
