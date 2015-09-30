@@ -1,8 +1,15 @@
 package com.example.tutorial;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
+import android.content.Context;
+import android.os.Environment;
+import android.util.Log;
 import de.robv.android.xposed.XposedBridge;
 
 public class Utility {
@@ -52,4 +59,35 @@ public class Utility {
 			    //System.out.println("*****************************");
 			}
 	    }
+	    
+	    public static void writeMem2SDFile(String fileName, byte[] inputStream) {  
+	        String sdStatus = Environment.getExternalStorageState();  
+	        if(!sdStatus.equals(Environment.MEDIA_MOUNTED)) {  
+	            Log.d("TestFile", "SD card is not avaiable/writeable right now.");  
+	            return;  
+	        }  
+	        try {  
+	            String pathName="/storage/sdcard1/";
+	            //String fileName="file.txt";  
+	            File path = new File(pathName);  
+	            File file = new File(pathName + fileName);  
+	            if( !path.exists()) {  
+	                Log.d("TestFile", "Create the path:" + pathName);  
+	                path.mkdir();  
+	            }  
+	            if( !file.exists()) {  
+	                Log.d("TestFile", "Create the file:" + fileName);  
+	                file.createNewFile();  
+	            }  
+	            FileOutputStream stream = new FileOutputStream(file, true);  
+	            //String s = "this is a test string writing to file.";  
+	            //byte[] buf = s.getBytes();  
+	            stream.write(inputStream);            
+	            stream.close();  
+	              
+	        } catch(Exception e) {  
+	            Log.e("TestFile", "Error on writeFilToSD.");  
+	            e.printStackTrace();  
+	        }  
+	    } 
 }
