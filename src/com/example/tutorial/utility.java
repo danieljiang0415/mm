@@ -61,7 +61,7 @@ public class Utility {
 	    
 	    @SuppressWarnings("rawtypes")
 	    public static void getMethodInfo(Class clazz) {
-	    	//Class clazz = XposedHelpers.findClass(className, lpparam.classLoader);//Class.forName(pkgName);
+
 			Method[] methods = clazz.getMethods();
 			for (Method method : methods) {
 			    String methodName = method.getName();
@@ -73,7 +73,6 @@ public class Utility {
 			        //System.out.println("参数名称:" + parameterName);
 			        XposedBridge.log("参数名称:" + parameterName);
 			    }
-			    //System.out.println("*****************************");
 			}
 	    }
 	    
@@ -107,7 +106,7 @@ public class Utility {
 	            e.printStackTrace();  
 	        }  
 	    } 
-	    public synchronized static void writeLog2SDFile(String fileName, String logInfo) {  
+	    public synchronized static void writeLog2SDFile(String fileName, String tagInfo, String logInfo, boolean isMemdump) {  
 	        String sdStatus = Environment.getExternalStorageState();  
 	        if(!sdStatus.equals(Environment.MEDIA_MOUNTED)) {  
 	            Log.d("TestFile", "SD card is not avaiable/writeable right now.");  
@@ -127,7 +126,8 @@ public class Utility {
 	                file.createNewFile();  
 	            }  
 	            FileOutputStream stream = new FileOutputStream(file, true);  
-	            String s = logInfo+"\r\n";  
+	            String trdInfo = String.format("%-8s", ("[~"+String.valueOf(Thread.currentThread().getId())+"]" ));
+	            String s =  trdInfo + tagInfo +"  "+ (isMemdump? "\r\n"+logInfo : logInfo) + "\r\n";  
 	            byte[] buf = s.getBytes();  
 	            stream.write(buf);            
 	            stream.close();  
@@ -137,4 +137,26 @@ public class Utility {
 	            e.printStackTrace();  
 	        }  
 	    } 
+	    
+	    public static String StackTrace() {
+	    	String stringStackTrace = "";
+	        StackTraceElement[] stackElements = new Throwable().getStackTrace();
+	        if(stackElements != null)
+	        {
+	            for(int i = 0; i < stackElements.length; i++)
+	            {
+	                //System.out.println(""+ stackElements[i]);
+	            	stringStackTrace += stackElements[i];
+	            	stringStackTrace += "\r\n";
+	            }
+	        }
+	        return stringStackTrace;
+	    }
+	    
+	    public static byte[] subBytes(byte[] src, int begin, int count) {
+	        byte[] bs = new byte[count];
+	        for (int i=begin; i<begin+count; i++) bs[i-begin] = src[i];
+	        return bs;
+	    }
+
 }

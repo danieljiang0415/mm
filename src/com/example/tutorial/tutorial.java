@@ -2,6 +2,8 @@ package com.example.tutorial;
 
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 
+import java.io.ByteArrayOutputStream;
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -20,33 +22,60 @@ public class tutorial implements IXposedHookLoadPackage {
         XposedBridge.log(lpparam.packageName);
         final Class<?> PByteArrary = XposedHelpers.findClass("com.tencent.mm.pointers.PByteArray", lpparam.classLoader);
         Class<?> PInt = XposedHelpers.findClass("com.tencent.mm.pointers.PInt", lpparam.classLoader);
-        //Field [] fields=PByteArrary.getDeclaredFields();
-    	//for(Field field:fields){
-	    //	field.setAccessible(true);//设置访问权限
-	    //	System.out.println(field.getName());
-	    //	XposedBridge.log(field.getName());
-    	//}
-    	//XposedBridge.log("----------------------------------------------------");
-    	//getMethodInfo(XposedHelpers.findClass("com.tencent.mm.protocal.MMProtocalJni", lpparam.classLoader));
-    	//XposedBridge.log("***************************************************====>");
     	
         findAndHookMethod("com.tencent.mm.protocal.MMProtocalJni", lpparam.classLoader, "pack", byte[].class, PByteArrary, byte[].class, byte[].class, String.class, int.class, int.class, int.class, byte[].class, byte[].class, byte[].class, boolean.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 // this will be called before the clock was updated by the original method
-            	String s = Utility.byte2HexStr((byte[]) param.args[0]);
-            	Utility.writeLog2SDFile("logger.log", s );
-            	//XposedBridge.log("-------------->" + s );
-            	//s = "packet start-->";
-            	//Utility.writeMem2SDFile("logger.log", s.getBytes() );
-            	//Utility.writeMem2SDFile("logger.log", (byte[])param.args[0] );
+            	byte[] packBuf = (byte[]) param.args[0];
+            	String s = Utility.byte2HexStr(packBuf);
+            	Utility.writeLog2SDFile("logger.log", "MMProtocalJni->pack", s,  true);
+            	Utility.writeLog2SDFile("logger.log", "CallStack", Utility.StackTrace(), false);
+            	String stringUrl, sendId2;
+            	sendId2 = "10000397012015100810994940586";
+            	stringUrl = new String(Utility.subBytes(packBuf, 0x1ee, 29));
+            	if(stringUrl.equals("10000309012015100810784039966")) {
+            		Utility.writeLog2SDFile("logger.log", stringUrl, "sendId-->", false);
+            		//System.arraycopy(sendId2.getBytes(), 0, packBuf, 0x1ee, 29);
+            		//System.arraycopy(sendId2.getBytes(), 0, packBuf, 0x264, 29);
+            		stringUrl.replaceAll("10000309012015100810784039966", "10000397012015100810994940586");
+            		param.args[0] = packBuf;
+            		s = Utility.byte2HexStr(packBuf);
+                	Utility.writeLog2SDFile("logger.log", "MMProtocalJni->packM", s,  true);
+            	}
             }
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                 // this will be called after the clock was updated by the original method
             }
-        });
+        });//[B[B[BLcom/tencent/mm/protocal/h$c;Ljava/io/ByteArrayOutputStream;Z
         
+        //final Class<?> clas = XposedHelpers.findClass("com.tencent.mm.q.p", lpparam.classLoader);
+        //Utility.getMethodInfo(clas);
+        /*
+        findAndHookMethod("com.tencent.mm.q.p", lpparam.classLoader, "a", int.class, byte[].class, byte[].class, byte[].class, int.class, boolean.class, new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                // this will be called before the clock was updated by the original method
+            	byte[] packBuf = (byte[]) param.args[1];
+            	String s = Utility.byte2HexStr(packBuf);
+            	Utility.writeLog2SDFile("logger.log", s,  String.format("[com.tencent.mm.q.p->a1(%d)]", packBuf.length));
+            	packBuf = (byte[]) param.args[2];
+            	s = Utility.byte2HexStr(packBuf);
+            	Utility.writeLog2SDFile("logger.log", s,  String.format("[com.tencent.mm.q.p->a2(%d)]", packBuf.length));
+            	packBuf = (byte[]) param.args[3];
+            	s = Utility.byte2HexStr(packBuf);
+            	Utility.writeLog2SDFile("logger.log", s,  String.format("[com.tencent.mm.q.p->a3(%d)]", packBuf.length));
+            	Utility.writeLog2SDFile("logger.log",  String.format("[com.tencent.mm.q.p->a(%d, %d)]", param.args[0],param.args[4]), "[com.tencent.mm.q.p->a]");
+            	//Utility.writeLog2SDFile("logger.log", Utility.StackTrace(), "CallStack-->");
+            }
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                // this will be called after the clock was updated by the original method
+            	Utility.writeLog2SDFile("logger.log", (String)param.getResult(), "getPassword-->");
+            }
+        });
+        */
         findAndHookMethod("com.tencent.mm.protocal.MMProtocalJni", lpparam.classLoader, "unpack", PByteArrary, byte[].class, byte[].class, PByteArrary, PInt, PInt, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
@@ -57,10 +86,11 @@ public class tutorial implements IXposedHookLoadPackage {
                 // this will be called after the clock was updated by the original method
     	    	Field field = PByteArrary.getDeclaredField("value");
     	        field.setAccessible(true);
-    	        byte[] buf = (byte[]) field.get(param.args[0]);
-            	Utility.writeLog2SDFile("logger.log", "unpack size---->"+String.valueOf(buf.length) );		
-            	String s = Utility.byte2HexStr(buf);
-            	Utility.writeLog2SDFile("logger.log", s );
+    	        byte[] unpackBuf = (byte[]) field.get(param.args[0]);
+            	//Utility.writeLog2SDFile("logger.log", "unpack size---->"+String.valueOf(buf.length) );		
+            	//String s = Utility.byte2HexStr(unpackBuf);
+            	//Utility.writeLog2SDFile("logger.log", "MMProtocalJni->unpack", s,  true);
+            	//Utility.writeLog2SDFile("logger.log", "CallStack",Utility.StackTrace(), false);
             	//XposedBridge.log("<--------------" + s );
             	//s = "<--packet start";
             	//Utility.writeMem2SDFile("logger.log", s.getBytes() );
@@ -74,7 +104,7 @@ public class tutorial implements IXposedHookLoadPackage {
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 // this will be called before the clock was updated by the original method
         	   // XposedBridge.log( (String) param.args[2] + param.args[3] + param.args[8]);
-            	Utility.writeLog2SDFile("logger.log", (String)param.args[8] );
+            	//Utility.writeLog2SDFile("logger.log", "logWrite2", (String)param.args[8], false );
             }
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
