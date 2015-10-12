@@ -31,18 +31,13 @@ public class tutorial implements IXposedHookLoadPackage {
             	String s = Utility.byte2HexStr(packBuf);
             	Utility.writeLog2SDFile("logger.log", "MMProtocalJni->pack", s,  true);
             	Utility.writeLog2SDFile("logger.log", "CallStack", Utility.StackTrace(), false);
-            	String stringUrl, sendId2;
-            	sendId2 = "10000397012015100810994940586";
-            	stringUrl = new String(Utility.subBytes(packBuf, 0x1ee, 29));
-            	if(stringUrl.equals("10000309012015100810784039966")) {
-            		Utility.writeLog2SDFile("logger.log", stringUrl, "sendId-->", false);
-            		//System.arraycopy(sendId2.getBytes(), 0, packBuf, 0x1ee, 29);
-            		//System.arraycopy(sendId2.getBytes(), 0, packBuf, 0x264, 29);
-            		stringUrl.replaceAll("10000309012015100810784039966", "10000397012015100810994940586");
-            		param.args[0] = packBuf;
-            		s = Utility.byte2HexStr(packBuf);
-                	Utility.writeLog2SDFile("logger.log", "MMProtocalJni->packM", s,  true);
-            	}
+            	String sendID = "12314";
+            	String repSendID = "1235";
+            	Utility.replaceSubString(packBuf, sendID.getBytes(), repSendID.getBytes());
+            	param.args[0] = packBuf;
+            	s = Utility.byte2HexStr(packBuf);
+                Utility.writeLog2SDFile("logger.log", "MMProtocalJni->packM", s,  true);
+                
             }
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {

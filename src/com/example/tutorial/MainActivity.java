@@ -11,6 +11,9 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		byte [] src = {1,2,3,4,5,6,7,8,9,0, 0, 0, 0, 0, 0, 0,3,4,2,0,0,0};
+		byte [] key = {3,4,2};
+
 	}
 
 	@Override
